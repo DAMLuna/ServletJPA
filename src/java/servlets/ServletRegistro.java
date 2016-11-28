@@ -26,7 +26,9 @@ import jpa.AndlunUserGame;
  * @author alfas
  */
 public class ServletRegistro extends HttpServlet {
+
     EntityManagerFactory emf = Persistence.createEntityManagerFactory("3.4.3ServletJPAPU");
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -52,7 +54,7 @@ public class ServletRegistro extends HttpServlet {
             out.println("<h1>Lista de users</h1>");
             if (usergame != null && !usergame.isEmpty()) {
                 for (AndlunUserGame andlunUserGame : usergame) {
-                    out.println("+ " + andlunUserGame.getIdUser() + " -> " + andlunUserGame.getNameUser() + " + " + andlunUserGame.getPasswd()+"<br>");
+                    out.println("+ " + andlunUserGame.getIdUser() + " -> " + andlunUserGame.getNameUser() + " + " + andlunUserGame.getPasswd() + "<br>");
                 }
 
             } else {
@@ -91,45 +93,85 @@ public class ServletRegistro extends HttpServlet {
             throws ServletException, IOException {
         try {
 //            processRequest(request, response);
+            boolean emailCompr = false,nickCompr = false;
             AndlunUserGameJpaController userJpaContr = new AndlunUserGameJpaController(emf);//llama a la clase de controlador
+            List<AndlunUserGame> usergame = userJpaContr.findAndlunUserGameEntities();
             AndlunUserGame jpauser = new AndlunUserGame();//llama a la clase de jpa
             Encriptacion encript = new Encriptacion(); //llama a la clase encriptacion para los passwords
-            String name = request.getParameter("nick");//guardo el contenido del formulario en variables
+            String nick = request.getParameter("nick").toLowerCase();//guardo el contenido del formulario en variables
             String pass1 = encript.md5(request.getParameter("passwd1"));
             String pass2 = encript.md5(request.getParameter("passwd2"));
             String email = request.getParameter("email");
-            if (pass1.contentEquals(pass2)) {
+            //Comprobamos que el email no se repite
+            if (usergame != null && !usergame.isEmpty()) {
+                for (AndlunUserGame andlunUserGame : usergame) {
+                    if (nick.contentEquals(andlunUserGame.getNameUser())) {
+                        nickCompr = true;
+                    }
+                    if (email.contentEquals(andlunUserGame.getEmail())) {
+                        emailCompr = true;
+                    }
+                }
+            }
+            if (pass1.contentEquals(pass2) && nickCompr == false && emailCompr == false) {
                 //Introduzco los atributos de user a su clase para introducirlos a la base de datos.
-                jpauser.setNameUser(name);
+                jpauser.setNameUser(nick);
                 jpauser.setPasswd(pass1);
                 jpauser.setEmail(email);
-                userJpaContr.create(jpauser); 
+                userJpaContr.create(jpauser);
                 response.setContentType("text/html;charset=UTF-8");
                 try (PrintWriter out = response.getWriter()) {
                     /* TODO output your page here. You may use following sample code. */
-                    out.println("<!DOCTYPE html>");
-                    out.println("<html>");
-                    out.println("<head>");
-                    out.println("<title>Servlet ServlRegistro</title>");
-                    out.println("</head>");
-                    out.println("<body>");
-                    out.println("<h1>Registro Completado!!</h1>");
-                    out.println("</body>");
-                    out.println("</html>");
+                    request.getRequestDispatcher("index2.jsp").include(request, response);
+                       out.println("<p style='color:white;text-align: center'>Registro completado ahora puedes Iniciar sesión<p>");
+                    
                 }
             } else {
-                response.setContentType("text/html;charset=UTF-8");
-                try (PrintWriter out = response.getWriter()) {
-                    /* TODO output your page here. You may use following sample code. */
-                    out.println("<!DOCTYPE html>");
-                    out.println("<html>");
-                    out.println("<head>");
-                    out.println("<title>Servlet ServlRegistro</title>");
-                    out.println("</head>");
-                    out.println("<body>");
-                    out.println("<h1>Las contraseñas no coinciden</h1>");
-                    out.println("</body>");
-                    out.println("</html>");
+                if (emailCompr == true) {
+                    response.setContentType("text/html;charset=UTF-8");
+                    try (PrintWriter out = response.getWriter()) {
+                        /* TODO output your page here. You may use following sample code. */
+                        out.println("<!DOCTYPE html>");
+                        out.println("<html>");
+                        out.println("<head>");
+                        out.println("<title>Servlet ServlRegistro</title>");
+                        out.println("<link rel=\"StyleSheet\" href=\"index_style.css\" media=\"all\" type=\"text/css\">");
+                        out.println("</head>");
+                        out.println("<body>");
+                        out.println("<h1>Ya hay un usuario registrado con ese email.</h1>");
+                        out.println("</body>");
+                        out.println("</html>");
+                    }
+                }else if(nickCompr== true){
+                    response.setContentType("text/html;charset=UTF-8");
+                    try (PrintWriter out = response.getWriter()) {
+                        /* TODO output your page here. You may use following sample code. */
+                        out.println("<!DOCTYPE html>");
+                        out.println("<html>");
+                        out.println("<head>");
+                        out.println("<title>Servlet ServlRegistro</title>");
+                        out.println("<link rel=\"StyleSheet\" href=\"index_style.css\" media=\"all\" type=\"text/css\">");
+                        out.println("</head>");
+                        out.println("<body>");
+                        out.println("<h1>Ya hay un usuario registrado con ese Nombre de usuario.</h1>");
+                        out.println("</body>");
+                        out.println("</html>");
+                    }
+                } else {
+                    response.setContentType("text/html;charset=UTF-8");
+                    try (PrintWriter out = response.getWriter()) {
+                        /* TODO output your page here. You may use following sample code. */
+                        out.println("<!DOCTYPE html>");
+                        out.println("<html>");
+                        out.println("<head>");
+                        out.println("<title>Servlet ServlRegistro</title>");
+                        out.println("<link rel=\"StyleSheet\" href=\"index_style.css\" media=\"all\" type=\"text/css\">");
+                        out.println("</head>");
+                        out.println("<body>");
+                        out.println("<h1>Las contraseñas no coinciden</h1>");
+                        out.println("</body>");
+                        out.println("</html>");
+                    }
                 }
             }
         } catch (NoSuchAlgorithmException ex) {
