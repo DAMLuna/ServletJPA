@@ -17,7 +17,9 @@ body					{ background: url('../img/bg.png'); margin: 0; overflow: hidden; width:
 #state h1.win			{ text-shadow: 2px 0 0 #44CE00, -2px 0 0 #44CE00, 0 2px 0 #44CE00, 0 -2px 0 #44CE00, 1px 1px #44CE00, -1px -1px 0 #44CE00, 1px -1px 0 #44CE00, -1px 1px 0 #44CE00; }
 #state h1.lose			{ text-shadow: 2px 0 0 #f00, -2px 0 0 #f00, 0 2px 0 #f00, 0 -2px 0 #f00, 1px 1px #f00, -1px -1px 0 #f00, 1px -1px 0 #f00, -1px 1px 0 #f00; }
 #state h2				{ margin: 0; }
+#state form                             { margin: 0; display: block }
 #state a				{ transition: background-color 0.5s; margin-top: 35px; display: inline-block; background: #0f0; background-color: #4CAF50; color: #fff; padding: 15px 32px; text-decoration: none; font-size: 16px; }
+#state input				{ transition: background-color 0.5s; margin-top: 35px; display: inline-block; background: #0f0; background-color: #4CAF50; color: #fff; padding: 15px 32px; text-decoration: none; font-size: 16px; }
 #state a:hover			{ background: #72F977; }
 #state .container		{ border-top-left-radius: 40px; border-bottom-right-radius: 40px; height: 300px; padding: 20px; background: rgba(50,50,50,0.7); width: 400px; left: 50%; margin-left: -220px; top: 50%; margin-top: -170px; position: absolute; }
 #state .ads				{ height: 90px; background: #fff; color: #000; margin-top: 25px; }

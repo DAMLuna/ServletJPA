@@ -4,6 +4,9 @@
     Author     : alfas
 --%>
 
+<%@page import="jpa.AndlunRegistry"%>
+<%@page import="jpa.AndlunUserGame"%>
+<%@page import="java.util.List"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -15,10 +18,13 @@
         <title></title>
     </head>
     <body>
-        <div class="contenedor">
+        <div class="contenedor">            
+            <%String stnick = (String) request.getAttribute("nombreuser");%>
+            <%List<AndlunRegistry> scoreP = (List) request.getAttribute("scoresPers");%>
             <form action="/3.4.3ServletJPA/ServletLogout" method="post">
-                <input type="submit" name="Logout" value="Logout">
+                <input id="blogout" type="submit" value="Logout">
             </form>
+            <p style="float: right;">Cuenta de <%=stnick%></p>
             <div class="titulo">Park The Spacecraft</div>
             <div id="pestanas">
                 <ul id=lista>
@@ -27,20 +33,35 @@
                     <li id="pestana3"><a href='javascript:cambiarPestanna(pestanas,pestana3);'>Score Mundial</a></li>
                 </ul>
             </div>
-            
-            <body onload="javascript:cambiarPestanna(pestanas,pestana1);">
-       
-            <div id="contenidopestanas">
-                <div id="cpestana1">
-                   Boton Game 
+
+            <body onload="javascript:cambiarPestanna(pestanas, pestana1);">
+
+                <div id="contenidopestanas">
+                    <div id="cpestana1">
+                        <form action="/3.4.3ServletJPA/Game" method="get">
+                            <center><input id="binicio" type="submit" value="Iniciar Partida"></center>
+                        </form> 
+                    </div>
+                    <div id="cpestana2">                        
+                        <center><table style="text-align: center">
+                                <tr>
+                                    <th colspan="3">Top 50 de <%=stnick%> </th>
+                                </tr>
+                                <%for (int i = 0; i < scoreP.size(); i++) {
+
+                                %>
+                                <tr>
+                                    <td><%=i + 1%></td>
+                                    <td>------------------------------------------------------------------</td>
+                                    <td><%=scoreP.get(i).getSpeed()%></td>
+                                </tr>
+                                <%}%>
+                            </table></center>
+                    </div>
+                    <div id="cpestana3">
+                        top mundial
+                    </div>
                 </div>
-                <div id="cpestana2">
-                    Top 50 de puntuacion propia.
-                </div>
-                <div id="cpestana3">
-                    top 100 de puntuacion global.
-                </div>
-            </div>
         </div>
     </body>
 </html>

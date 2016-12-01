@@ -6,6 +6,7 @@
 package servlets;
 
 import clases.Encriptacion;
+import controllers.AndlunRegistryJpaController;
 import controllers.AndlunUserGameJpaController;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,14 +14,18 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import jpa.AndlunRegistry;
 import jpa.AndlunUserGame;
 
 /**
@@ -30,34 +35,6 @@ import jpa.AndlunUserGame;
 public class ServletLogin extends HttpServlet {
 
     EntityManagerFactory emf = Persistence.createEntityManagerFactory("3.4.3ServletJPAPU");
-
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet ServletLogin</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet ServletLogin at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
-
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -72,8 +49,11 @@ public class ServletLogin extends HttpServlet {
 //        processRequest(request, response);
         AndlunUserGameJpaController userJpaContr = new AndlunUserGameJpaController(emf);//llama a la clase de controlador
         List<AndlunUserGame> usergame = userJpaContr.findAndlunUserGameEntities();
+        AndlunRegistryJpaController regJpaContr = new AndlunRegistryJpaController(emf);//llama a la clase de controlador
+        List<AndlunRegistry> listRegPer = regJpaContr.findAndlunRegistryEntities();
         AndlunUserGame jpauser = new AndlunUserGame();
         String comprCookie;
+        int iduser = 0;
         boolean nickCompr = false, passwCompr = false;
         Cookie ck[] = request.getCookies();
         for (Cookie cookie : ck) {
@@ -81,14 +61,19 @@ public class ServletLogin extends HttpServlet {
             for (AndlunUserGame andlunUserGame : usergame) {
                 if (comprCookie.contentEquals(andlunUserGame.getNameUser())) {
                     nickCompr = true;
-                }
+                    iduser = andlunUserGame.getIdUser();
+                    String nick = comprCookie.toString();
+                    request.setAttribute("nombreuser", nick);
+                }                
                 if (comprCookie.contentEquals(andlunUserGame.getPasswd())) {
-                    passwCompr = true;
-                }
+                    passwCompr = true;                    
+                }                
             }
         }
-        if (nickCompr == true && passwCompr == true) {
-            response.sendRedirect("panelprincipal.jsp");
+        if (nickCompr == true && passwCompr==true) {            
+            request.setAttribute("scoresPers", listRegPer(iduser));
+            RequestDispatcher a = request.getRequestDispatcher("panelprincipal.jsp");
+            a.forward(request, response);
         } else {
             RequestDispatcher a = request.getRequestDispatcher("index2.jsp");
             a.forward(request, response);
@@ -111,16 +96,20 @@ public class ServletLogin extends HttpServlet {
         try {
             AndlunUserGameJpaController userJpaContr = new AndlunUserGameJpaController(emf);//llama a la clase de controlador
             List<AndlunUserGame> usergame = userJpaContr.findAndlunUserGameEntities();
+            AndlunRegistryJpaController regJpaContr = new AndlunRegistryJpaController(emf);//llama a la clase de controlador
+            List<AndlunRegistry> listRegPer = regJpaContr.findAndlunRegistryEntities();
             AndlunUserGame jpauser = new AndlunUserGame();//llama a la clase de jpa
             Encriptacion encript = new Encriptacion(); //llama a la clase encriptacion para los passwords
             String nick = request.getParameter("nick").toLowerCase();//guardo el contenido del formulario en variables
             String pass = encript.md5(request.getParameter("passwd"));
+            int iduser=0;
             boolean nickCompr = false;
             boolean passwCompr = false;
             if (usergame != null && !usergame.isEmpty()) {
                 for (AndlunUserGame andlunUserGame : usergame) {
                     if (nick.contentEquals(andlunUserGame.getNameUser())) {
                         nickCompr = true;
+                        iduser = andlunUserGame.getIdUser();
                     }
                     if (pass.contentEquals(andlunUserGame.getPasswd())) {
                         passwCompr = true;
@@ -129,21 +118,24 @@ public class ServletLogin extends HttpServlet {
                 if (nickCompr == true && passwCompr == true) {
                     Cookie ckn = new Cookie("nick", nick);
                     Cookie ckp = new Cookie("passwd", pass);
-                    ckn.setMaxAge(60*30);
-                    ckp.setMaxAge(60*30);
-                    ckn.setPath("/3.4.3ServletJPA");
-                    ckp.setPath("/3.4.3ServletJPA");
+                    String stnick = nick.toString();
+                    ckn.setMaxAge(60 * 60);
+                    ckp.setMaxAge(60 * 60);
+                    ckn.setPath("/");
+                    ckp.setPath("/");
                     response.addCookie(ckn);
                     response.addCookie(ckp);
-                    response.sendRedirect("panelprincipal.jsp");
+                    request.setAttribute("nombreuser", stnick);
+                    request.setAttribute("scoresPers", listRegPer(iduser));
+                    RequestDispatcher a = request.getRequestDispatcher("panelprincipal.jsp");
+                    a.forward(request, response);
                 } else {
                     response.setContentType("text/html;charset=UTF-8");
                     try (PrintWriter out = response.getWriter()) {
                         /* TODO output your page here. You may use following sample code. */
                         request.getRequestDispatcher("index2.jsp").include(request, response);
-                       out.println("<p style='color:white;text-align: center'>El nombre de usuario o contraseña no son correctos<p>");
-                      
-                      
+                        out.println("<p style='color:white;text-align: center'>El nombre de usuario o contraseña no son correctos<p>");
+
                     }
                 }
             }
@@ -161,5 +153,13 @@ public class ServletLogin extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
+    
+    public List<AndlunRegistry> listRegPer(int codi) {
+        EntityManager em = emf.createEntityManager();
+        @SuppressWarnings("unchecked")
+//        Query query = em.createQuery("SELECT a FROM AndlunRegistry a, WHERE a.idUser.idUser =:code ORDER BY a.speed");        
+        TypedQuery<AndlunRegistry> query = em.createNamedQuery("AndlunRegistry.findByIdUser", AndlunRegistry.class);
+        query.setParameter("code", codi);
+        return query.getResultList();
+    }
 }

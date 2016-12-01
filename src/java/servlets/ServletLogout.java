@@ -7,6 +7,7 @@ package servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
@@ -36,7 +37,7 @@ public class ServletLogout extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ServletLogout</title>");            
+            out.println("<title>Servlet ServletLogout</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet ServletLogout at " + request.getContextPath() + "</h1>");
@@ -72,17 +73,19 @@ public class ServletLogout extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 //        processRequest(request, response);
-        response.setContentType("text/html");  
-        PrintWriter out=response.getWriter(); 
-          
-        request.getRequestDispatcher("index.jsp").include(request, response);  
-          
-        Cookie ckn=new Cookie("nick","");  
-        Cookie ckp=new Cookie("passwd","");  
-        ckn.setMaxAge(0);  
-        ckp.setMaxAge(0);  
-        response.addCookie(ckn);  
-        response.addCookie(ckp);
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        Cookie ckn = new Cookie("nick", "");
+        Cookie ckp = new Cookie("passwd", "");
+        ckn.setPath("/");
+        ckp.setPath("/");
+        ckn.setMaxAge(0);
+        ckp.setMaxAge(0);
+        response.addCookie(ckn);
+        response.addCookie(ckp);        
+        RequestDispatcher a = request.getRequestDispatcher("index.jsp");
+        a.forward(request, response);
+
     }
 
     /**

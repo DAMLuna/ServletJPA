@@ -32,6 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "AndlunRegistry.findAll", query = "SELECT a FROM AndlunRegistry a")
     , @NamedQuery(name = "AndlunRegistry.findByIdPlay", query = "SELECT a FROM AndlunRegistry a WHERE a.idPlay = :idPlay")
+    , @NamedQuery(name = "AndlunRegistry.findByIdUser", query = "SELECT a FROM AndlunRegistry a WHERE a.idUser.idUser =:code ORDER BY a.speed")
     , @NamedQuery(name = "AndlunRegistry.findByStartDate", query = "SELECT a FROM AndlunRegistry a WHERE a.startDate = :startDate")
     , @NamedQuery(name = "AndlunRegistry.findByEndDate", query = "SELECT a FROM AndlunRegistry a WHERE a.endDate = :endDate")
     , @NamedQuery(name = "AndlunRegistry.findBySpeed", query = "SELECT a FROM AndlunRegistry a WHERE a.speed = :speed")})

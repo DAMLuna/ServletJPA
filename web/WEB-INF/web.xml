@@ -12,6 +12,10 @@
         <servlet-name>ServletLogout</servlet-name>
         <servlet-class>servlets.ServletLogout</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ServletStart</servlet-name>
+        <servlet-class>servlets.ServletStart</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>ServletLogin</servlet-name>
         <url-pattern>/ServletLogin</url-pattern>
@@ -25,6 +29,11 @@
     <servlet-mapping>
         <servlet-name>ServletLogout</servlet-name>
         <url-pattern>/ServletLogout</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ServletStart</servlet-name>
+        <url-pattern>/ServletStart</url-pattern>
+        <url-pattern>/Game</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
